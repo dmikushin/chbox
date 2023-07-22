@@ -20,6 +20,8 @@
 
 #include <config.h>
 
+#include "stat_ver.h"
+
 #ifdef HAVE___LXSTAT64
 # define _LARGEFILE64_SOURCE
 #endif

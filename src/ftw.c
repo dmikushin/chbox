@@ -22,6 +22,8 @@
 # include <config.h>
 #endif
 
+#include "stat_ver.h"
+
 #if ((!defined(__FTW64_C) && HAVE_FTW) || (defined(__FTW64_C) && HAVE_FTW64)) \
  && !defined(OPENDIR_CALLS___OPEN) && !defined(OPENDIR_CALLS___OPENDIR2) && !defined(HAVE__XFTW)
 
