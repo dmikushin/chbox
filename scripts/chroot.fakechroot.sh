@@ -99,6 +99,9 @@ if [ -d "$fakechroot_chroot_newroot" ]; then
 
     fakechroot_chroot_paths="$fakechroot_chroot_paths${fakechroot_chroot_paths_ldsoconf:+:$fakechroot_chroot_paths_ldsoconf}${fakechroot_chroot_paths_extra:+:$fakechroot_chroot_paths_extra}${FAKECHROOT_LDLIBPATH:+:$FAKECHROOT_LDLIBPATH}"
     fakechroot_chroot_paths="${fakechroot_chroot_paths#:}"
+    # Append /lib/systemd under newroot, so that systemctl works. debootstrap needs this on hosts without systemd or with another architecture.
+    fakechroot_chroot_paths="${fakechroot_chroot_paths}:${fakechroot_chroot_newroot}/lib/systemd"
+    fakechroot_chroot_paths="${fakechroot_chroot_paths#:}"
 fi
 
 # correct newroot if we chroot into the root
