@@ -1,0 +1,9 @@
+[submodule "ThirdParty/fakeroot"]
+	path = ThirdParty/fakeroot
+	url = https://salsa.debian.org/clint/fakeroot.git
+[submodule "ThirdParty/fakechroot"]
+	path = ThirdParty/fakechroot
+	url = https://github.com/dex4er/fakechroot.git
+[submodule "ThirdParty/debootstrap"]
+	path = ThirdParty/debootstrap
+	url = https://salsa.debian.org/installer-team/debootstrap.git

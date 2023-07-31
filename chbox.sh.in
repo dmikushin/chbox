@@ -1,0 +1,5 @@
+if [ -z "$NAME" ]; then
+    NAME=jessie
+fi
+
+DEBOOTSTRAP_DIR=@CMAKE_CURRENT_BINARY_DIR@/usr/share/debootstrap @CMAKE_CURRENT_BINARY_DIR@/bin/fakechroot @CMAKE_CURRENT_BINARY_DIR@/bin/fakeroot @CMAKE_CURRENT_BINARY_DIR@/usr/sbin/debootstrap $NAME /tmp/$NAME
