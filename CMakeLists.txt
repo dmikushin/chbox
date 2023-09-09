@@ -11,7 +11,7 @@ find_program(MAKE_EXECUTABLE NAMES make REQUIRED)
 set(fakeroot_EXECUTABLE "${CMAKE_INSTALL_PREFIX}/bin/fakeroot")
 
 if (DISABLE_HAVE_CAPSET)
-set(FAKEROOT_PATCH_COMMAND "${CMAKE_COMMAND} -E patch < ${CMAKE_CURRENT_SOURCE_DIR}/disable_have_capset.patch")
+set(FAKEROOT_PATCH_COMMAND patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/disable_have_capset.patch)
 endif()
 
 ExternalProject_Add(fakeroot
