@@ -2,15 +2,22 @@ cmake_minimum_required(VERSION 3.1)
 
 project(chbox LANGUAGES C)
 
+option(DISABLE_HAVE_CAPSET "On Rocky Linux HAVE_CAPSET is causing errors and must be disabled" OFF)
+
 include(ExternalProject)
 
 find_program(MAKE_EXECUTABLE NAMES make REQUIRED)
 
 set(fakeroot_EXECUTABLE "${CMAKE_INSTALL_PREFIX}/bin/fakeroot")
 
+if (DISABLE_HAVE_CAPSET)
+set(FAKEROOT_PATCH_COMMAND "${CMAKE_COMMAND} -E patch < ${CMAKE_CURRENT_SOURCE_DIR}/disable_have_capset.patch")
+endif()
+
 ExternalProject_Add(fakeroot
     GIT_REPOSITORY https://github.com/dmikushin/chbox.git
     GIT_TAG fakeroot
+    PATCH_COMMAND ${FAKEROOT_PATCH_COMMAND}
     CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=${CMAKE_INSTALL_PREFIX}/fakeroot
     BUILD_COMMAND ${MAKE_EXECUTABLE} -j
     INSTALL_COMMAND ${MAKE_EXECUTABLE} -j install

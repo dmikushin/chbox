@@ -1,0 +1,13 @@
+diff --git a/configure.ac b/configure.ac
+index 5ba304f..c2d079c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -372,7 +372,7 @@ AC_SEARCH_LIBS(acl_trivial, sec)
+ AC_CHECK_FUNCS(acl_trivial)
+ LIBS="$save_LIBS"
+ 
+-AC_CHECK_FUNCS(capset listxattr llistxattr flistxattr getxattr lgetxattr fgetxattr setxattr lsetxattr fsetxattr removexattr lremovexattr fremovexattr)
++AC_CHECK_FUNCS(listxattr llistxattr flistxattr getxattr lgetxattr fgetxattr setxattr lsetxattr fsetxattr removexattr lremovexattr fremovexattr)
+ 
+ AC_CHECK_FUNCS(statx)
+ 
