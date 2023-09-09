@@ -13,6 +13,6 @@ RUN git clone https://github.com/dmikushin/chbox.git && \
     cd chbox && \
     mkdir build && \
     cd build && \
-    cmake -DCMAKE_INSTALL_PREFIX=/chbox_install -DDISABLE_HAVE_CAPSET=ON .. && \
+    cmake -DCMAKE_INSTALL_PREFIX=/chbox_install -DDISABLE_HAVE_CAPSET=ON -DTARGET_DISTRO="RockyLinux-8.8" .. && \
     make && \
     cpack
