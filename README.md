@@ -17,7 +17,8 @@ git clone --recurse-submodules https://github.com/dmikushin/chbox.git
 cd chbox
 mkdir build
 cd build
-cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/install ..
+cmake ..
+make
 ```
 
 Build for Rocky Linux 8.8 in a Docker container:
@@ -31,8 +32,8 @@ docker build -t chbox:rockylinux-8.8 docker/rockylinux-8.8
 The following commands shall install an Ubuntu 22.04 (Jammy) root filesystem into the given folder, and open a bash session in it. All without the root priviledges:
 
 ```
-export PATH=$(pwd)/install/bin:$PATH
+export PATH=$(pwd)/bin:$PATH
 chbox-debootstrap jammy ./jammy http://archive.ubuntu.com/ubuntu/
-chbox-chroot /home/marcusmae/forge/chbox/build/jammy bash
+chbox-chroot ./jammy bash
 ```
 

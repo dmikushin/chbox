@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.1)
 
 project(chbox LANGUAGES C)
+set(PROJECT_VERSION_MAJOR 1)
+set(PROJECT_VERSION_MINOR 0)
+set(PROJECT_VERSION_PATCH 0)
 
 option(DISABLE_HAVE_CAPSET "On Rocky Linux HAVE_CAPSET is causing errors and must be disabled" OFF)
 
@@ -10,14 +13,33 @@ find_program(MAKE_EXECUTABLE NAMES make REQUIRED)
 
 set(fakeroot_EXECUTABLE "${CMAKE_CURRENT_BINARY_DIR}/bin/fakeroot")
 
-if (DISABLE_HAVE_CAPSET)
-set(FAKEROOT_PATCH_COMMAND patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/disable_have_capset.patch)
-endif()
+# Workaround issue with repeated patches application:
+# https://gitlab.kitware.com/cmake/cmake/-/issues/21086
+function(ExternalProject_Add_Patches name)
+    ExternalProject_Get_Property(${name} STAMP_DIR)
+    ExternalProject_Get_Property(${name} SOURCE_DIR)
+
+    foreach(patch ${ARGN})
+        list(APPEND absolute_paths "${patch}")
+    endforeach()
+
+    set(patch_command patch -d "${SOURCE_DIR}" -p1 --fuzz=0 -i)
+    foreach(patch ${absolute_paths})
+        list(APPEND cmd_list COMMAND ${patch_command} "${patch}")
+    endforeach()
+
+    _ep_get_step_stampfile(${name} download download_stampfile)
+    add_custom_command(
+        APPEND
+        OUTPUT ${download_stampfile}
+        ${cmd_list}
+        DEPENDS ${absolute_paths}
+    )
+endfunction()
 
 ExternalProject_Add(fakeroot
     GIT_REPOSITORY https://github.com/dmikushin/chbox.git
     GIT_TAG fakeroot
-    PATCH_COMMAND ${FAKEROOT_PATCH_COMMAND}
     CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=${CMAKE_CURRENT_BINARY_DIR}/fakeroot
     BUILD_COMMAND ${MAKE_EXECUTABLE} -j
     INSTALL_COMMAND ${MAKE_EXECUTABLE} -j install
@@ -27,9 +49,13 @@ ExternalProject_Add(fakeroot
 ExternalProject_Add_Step(fakeroot
     bootstrap
     COMMAND cd <SOURCE_DIR> && ./bootstrap
-    DEPENDEES patch
+    DEPENDEES download
     DEPENDERS configure
 )
+
+if (DISABLE_HAVE_CAPSET)
+ExternalProject_Add_Patches(fakeroot ${CMAKE_CURRENT_SOURCE_DIR}/disable_have_capset.patch)
+endif()
 
 add_executable(fakeroot::fakeroot IMPORTED)
 set_property(TARGET fakeroot::fakeroot PROPERTY IMPORTED_LOCATION ${fakeroot_EXECUTABLE})
@@ -81,6 +107,12 @@ install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/fakeroot ${CMAKE_CURRENT_BINARY_DI
     DESTINATION . USE_SOURCE_PERMISSIONS)
 
 set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
+set(VERSION_STRING "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
+if (TARGET_DISTRO)
+set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}-${VERSION_STRING}-${TARGET_DISTRO})
+else()
+set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}-${VERSION_STRING})
+endif()
 set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
