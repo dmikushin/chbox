@@ -1,0 +1,2 @@
+#!/bin/sh
+LD_LIBRARY_PATH=@CMAKE_INSTALL_PREFIX@/fakeroot/lib:@CMAKE_INSTALL_PREFIX@/fakechroot/lib/fakechroot DEBOOTSTRAP_DIR=@CMAKE_INSTALL_PREFIX@/debootstrap/usr/share/debootstrap @CMAKE_INSTALL_PREFIX@/fakeroot/bin/fakeroot @CMAKE_INSTALL_PREFIX@/fakechroot/bin/fakechroot @CMAKE_INSTALL_PREFIX@/debootstrap/usr/sbin/debootstrap $@
