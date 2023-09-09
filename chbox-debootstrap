@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+CHBOX_DIR=$SCRIPT_DIR/..
+LD_LIBRARY_PATH=$CHBOX_DIR/fakeroot/lib:$CHBOX_DIR/fakechroot/lib/fakechroot DEBOOTSTRAP_DIR=$CHBOX_DIR/debootstrap/usr/share/debootstrap $CHBOX_DIR/fakeroot/bin/fakeroot $CHBOX_DIR/fakechroot/bin/fakechroot $CHBOX_DIR/debootstrap/usr/sbin/debootstrap $@
