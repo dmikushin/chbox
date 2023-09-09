@@ -10,12 +10,20 @@ This package includes submodules derived from the following projects:
 
 ## Building
 
+Build for the host system:
+
 ```
 git clone --recurse-submodules https://github.com/dmikushin/chbox.git
 cd chbox
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/install ..
+```
+
+Build for Rocky Linux 8.8 in a Docker container:
+
+```
+docker build -t chbox:rockylinux-8.8 docker/rockylinux-8.8
 ```
 
 ## Example
