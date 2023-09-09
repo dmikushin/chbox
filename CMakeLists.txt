@@ -27,7 +27,7 @@ ExternalProject_Add(fakeroot
 ExternalProject_Add_Step(fakeroot
     bootstrap
     COMMAND cd <SOURCE_DIR> && ./bootstrap
-    DEPENDEES download
+    DEPENDEES patch
     DEPENDERS configure
 )
 
