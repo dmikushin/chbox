@@ -23,6 +23,8 @@ ChBox includes submodules derived from the following projects:
 * fakeroot: https://github.com/mackyle/fakeroot
 * fakechroot: https://github.com/dex4er/fakechroot
 
+In fact ChBox mainly relies on the projects above, and only provides additional patches and scripting.
+
 The main caveat of root priviledges emulation is that it is based on interception of the
 actual GLIBC API. Therefore, the versions of GLIBC used by host and chroot-ed systems must be
 compatible, or even equal. This works best, if host and chrooted systems are the same Linux Distro,
@@ -30,7 +32,15 @@ or different Linux Distros released the same year.
 
 Finally, ChBox provides a method to transparently access the given host system paths from within
 the chroot-ed filesystem. This is necessary for the user to work with the cluster storage, such as
-his own home folder, scratch and network filesystems.
+his own home folder, scratch and network filesystems:
+
+```
+# You can provide symlinks to the outside. The symlink have to be created before chroot is called.
+# It can be useful for accessing the real /proc and /dev directory.
+# You can also set the "FAKECHROOT_EXCLUDE_PATH" environment variable:
+cd chroot && mkdir -p scratch
+export FAKECHROOT_EXCLUDE_PATH=/tmp:/proc:/dev:/sys:/var/run:/home:/scratch
+```
 
 ## Building
 
