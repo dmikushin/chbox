@@ -1,4 +1,5 @@
-#!@SHELL@
+#!/usr/bin/env bash
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # fakechroot
 #
@@ -73,11 +74,11 @@ unset CDPATH
 
 # Default settings
 fakechroot_lib=libfakechroot.so
-fakechroot_paths=@libpath@
-fakechroot_sysconfdir=@sysconfdir@
+fakechroot_paths=$SCRIPT_DIR/../lib/fakechroot
+fakechroot_sysconfdir=$SCRIPT_DIR/../etc/fakechroot
 fakechroot_confdir=
 fakechroot_environment=
-fakechroot_bindir=
+fakechroot_bindir=$SCRIPT_DIR/../sbin
 
 if [ "$fakechroot_paths" = "no" ]; then
     fakechroot_paths=
