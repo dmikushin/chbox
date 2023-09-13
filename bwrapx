@@ -1,0 +1,113 @@
+#!/usr/bin/env python3
+import argparse
+import sys
+import re
+
+def is_valid_regex(pattern):
+    try:
+        re.compile(pattern)
+        return True
+    except re.error:
+        return False
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(prog='bwrap',
+                                     usage='%(prog)s [OPTIONS...] [--] COMMAND [ARGS...]',
+                                     description='bwrap - container setup utility (regex extension)',
+                                     add_help=False)
+
+    parser.add_argument('--help', action='help', help='Print this help')
+    parser.add_argument('--version', action='store_true', help='Print version')
+    parser.add_argument('--args', metavar='FD', help='Parse NUL-separated args from FD')
+    parser.add_argument('--unshare-all', action='store_true', help='Unshare every namespace we support by default')
+    parser.add_argument('--share-net', action='store_true', help='Retain the network namespace (can only combine with --unshare-all)')
+    parser.add_argument('--unshare-user', action='store_true', help='Create new user namespace (may be automatically implied if not setuid)')
+    parser.add_argument('--unshare-user-try', action='store_true', help='Create new user namespace if possible else continue by skipping it')
+    parser.add_argument('--unshare-ipc', action='store_true', help='Create new ipc namespace')
+    parser.add_argument('--unshare-pid', action='store_true', help='Create new pid namespace')
+    parser.add_argument('--unshare-net', action='store_true', help='Create new network namespace')
+    parser.add_argument('--unshare-uts', action='store_true', help='Create new uts namespace')
+    parser.add_argument('--unshare-cgroup', action='store_true', help='Create new cgroup namespace')
+    parser.add_argument('--unshare-cgroup-try', action='store_true', help='Create new cgroup namespace if possible else continue by skipping it')
+    parser.add_argument('--userns', metavar='FD', help='Use this user namespace (cannot combine with --unshare-user)')
+    parser.add_argument('--userns2', metavar='FD', help='After setup switch to this user namespace, only useful with --userns')
+    parser.add_argument('--disable-userns', action='store_true', help='Disable further use of user namespaces inside sandbox')
+    parser.add_argument('--assert-userns-disabled', action='store_true', help='Fail unless further use of user namespace inside sandbox is disabled')
+    parser.add_argument('--pidns', metavar='FD', help='Use this pid namespace (as parent namespace if using --unshare-pid)')
+    parser.add_argument('--uid', metavar='UID', help='Custom uid in the sandbox (requires --unshare-user or --userns)')
+    parser.add_argument('--gid', metavar='GID', help='Custom gid in the sandbox (requires --unshare-user or --userns)')
+    parser.add_argument('--hostname', metavar='NAME', help='Custom hostname in the sandbox (requires --unshare-uts)')
+    parser.add_argument('--chdir', metavar='DIR', help='Change directory to DIR')
+    parser.add_argument('--clearenv', action='store_true', help='Unset all environment variables')
+    parser.add_argument('--setenv', metavar=('VAR', 'VALUE'), nargs=2, action='append', help='Set an environment variable')
+    parser.add_argument('--unsetenv', metavar='VAR', action='append', help='Unset an environment variable')
+    parser.add_argument('--lock-file', dest='lock_file', metavar='DEST', help='Take a lock on DEST while sandbox is running')
+    parser.add_argument('--sync-fd', dest='sync_fd', metavar='FD', help='Keep this fd open while sandbox is running')
+    parser.add_argument('--bind', metavar=('SRC', 'DEST'), nargs=2, action='append', help='Bind mount the host path SRC on DEST')
+    parser.add_argument('--bind-try', metavar=('SRC', 'DEST'), nargs=2, action='append', help='Equal to --bind but ignores non-existent SRC')
+    parser.add_argument('--dev-bind', metavar=('SRC', 'DEST'), nargs=2, action='append', help='Bind mount the host path SRC on DEST, allowing device access')
+    parser.add_argument('--dev-bind-try', metavar=('SRC', 'DEST'), nargs=2, action='append', help='Equal to --dev-bind but ignores non-existent SRC')
+    parser.add_argument('--ro-bind', metavar=('SRC', 'DEST'), nargs=2, action='append', help='Bind mount the host path SRC readonly on DEST')
+    parser.add_argument('--ro-bind-try', metavar=('SRC', 'DEST'), nargs=2, action='append', help='Equal to --ro-bind but ignores non-existent SRC')
+    parser.add_argument('--remount-ro', dest='remount_ro', metavar='DEST', help='Remount DEST as readonly; does not recursively remount')
+    parser.add_argument('--exec-label', dest='exec_label', metavar='LABEL', help='Exec label for the sandbox')
+    parser.add_argument('--file-label', dest='file_label', metavar='LABEL', help='File label for temporary sandbox content')
+    parser.add_argument('--proc', metavar='DEST', help='Mount new procfs on DEST')
+    parser.add_argument('--dev', metavar='DEST', help='Mount new dev on DEST')
+    parser.add_argument('--tmpfs', metavar='DEST', help='Mount new tmpfs on DEST')
+    parser.add_argument('--mqueue', metavar='DEST', help='Mount new mqueue on DEST')
+    parser.add_argument('--dir', metavar='DEST', help='Create dir at DEST')
+    parser.add_argument('--file', nargs=2, metavar=('FD', 'DEST'), action='append', help='Copy from FD to destination DEST')
+    parser.add_argument('--bind-data', nargs=2, metavar=('FD', 'DEST'), action='append', help='Copy from FD to file which is bind-mounted on DEST')
+    parser.add_argument('--ro-bind-data', nargs=2, metavar=('FD', 'DEST'), action='append', help='Copy from FD to file which is readonly bind-mounted on DEST')
+    parser.add_argument('--symlink', nargs=2, metavar=('SRC', 'DEST'), action='append', help='Create symlink at DEST with target SRC')
+    parser.add_argument('--seccomp', nargs=1, metavar='FD', action='append', help='Load and use seccomp rules from FD (not repeatable)')
+    parser.add_argument('--add-seccomp-fd', dest='add_seccomp_fd', nargs=1, metavar='FD', action='append', help='Load and use seccomp rules from FD (repeatable)')
+    parser.add_argument('--block-fd', dest='block_fd', metavar='FD', help='Block on FD until some data to read is available')
+    parser.add_argument('--userns-block-fd', dest='userns_block_fd', metavar='FD', help='Block on FD until the user namespace is ready')
+    parser.add_argument('--info-fd', dest='info_fd', metavar='FD', help='Write information about the running container to FD')
+    parser.add_argument('--json-status-fd', dest='json_status_fd', metavar='FD', help='Write container status to FD as multiple JSON documents')
+    parser.add_argument('--new-session', action='store_true', help='Create a new terminal session')
+    parser.add_argument('--die-with-parent', action='store_true', help="Kills with SIGKILL child process (COMMAND) when bwrap or bwrap's parent dies.")
+    parser.add_argument('--as-pid-1', action='store_true', help='Do not install a reaper process with PID=1')
+    parser.add_argument('--cap-add', nargs=1, metavar='CAP', action='append', help='Add cap CAP when running as privileged user')
+    parser.add_argument('--cap-drop', nargs=1, metavar='CAP', action='append', help='Drop cap CAP when running as privileged user')
+    parser.add_argument('--perms', metavar='OCTAL', help='Set permissions of next argument (--bind-data, --file, etc.)')
+    parser.add_argument('--size', metavar='BYTES', help='Set size of next argument (only for --tmpfs)')
+    parser.add_argument('--chmod', nargs=2, metavar=('OCTAL', 'PATH'), action='append', help='Change permissions of PATH (must already exist)')
+
+    parser.add_argument('command', nargs=argparse.REMAINDER, help='Command to be executed followed by its arguments')
+
+    args = parser.parse_args()
+
+    # Access the parsed values as needed
+    if getattr(args, 'help', False):
+        parser.print_help()
+        sys.exit()
+
+    if not args.command:
+        parser.print_help()
+        sys.exit()
+
+    dash = ''
+    if args.command[0] == '--':
+        args.command = args.command[1:]
+        dash = ' --'
+    if not args.command:
+        parser.print_help()
+        sys.exit()
+
+    # Reconstruct the command line string
+    command_line = parser.prog
+
+    for arg, value in vars(args).items():
+        if value is not None and arg not in ('help', 'version', 'command') and value != parser.get_default(arg):
+            if isinstance(value, list):
+                for item in value:
+                    command_line += f" --{arg} {' '.join(item)}"
+            else:
+                command_line += f" --{arg} {value}"
+
+    command_line += dash + ' ' + ' '.join(args.command)
+    print(command_line)
+
