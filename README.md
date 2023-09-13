@@ -1,6 +1,6 @@
 # bwrapx
 
-This is an extension of BubbleWrap bwrap frontend, which adds an ability to specify options in form of regular expressions.
+This is an extension of BubbleWrap [bwrap](https://github.com/containers/bubblewrap) frontend, which adds an ability to specify options in form of regular expressions.
 
 ## Usage
 

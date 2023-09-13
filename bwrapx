@@ -143,14 +143,14 @@ if __name__ == '__main__':
 
         if not arg in ('bind', 'bind-try', 'dev-bind', 'dev-bind-try', 'ro-bind', 'ro-bind-try', 'symlink'):
             continue
-                
+
         for value in values:
             # If SRC is not a regex, then just keep this option as is.
             src = value[0]
             if not is_valid_regex(src):
                 new_args.append((arg, value))
                 continue
-            
+
             # We've got a regex in SRC, now we need to do the following:
             # 1) Find all files in the filesystem that are matching the regex
             # 2) Compute the replacement file for all matched filenames
@@ -204,7 +204,7 @@ if __name__ == '__main__':
             setattr(args, arg, [value])
         else:
             getattr(args, arg).append(value)
-    
+
     # Reconstruct the command line string: first convert
     # the args object into a list of command-line arguments
     command_line = [ parser.prog ]

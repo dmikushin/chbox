@@ -23,9 +23,9 @@ class TestCommandReconstruction(unittest.TestCase):
                 'full_match': True
             },
             {
-                'command': ['./bwrapx', '--bind', "'/usr/lib/absurd.*'", '\g<0>', '--bind', 'c', 'd', '--', 'bash', '-i'],    
+                'command': ['./bwrapx', '--bind', "'/usr/lib/absurd.*'", '\g<0>', '--bind', 'c', 'd', '--', 'bash', '-i'],
                 'expected': 'bwrap --bind c d -- bash -i',
-                'full_match': True        
+                'full_match': True
             },
             {
                 'command': ['./bwrapx', '--bind', '/usr/bin/fals.*', '\g<0>', '--bind', 'c', 'd', '--', 'bash', '-i'],
