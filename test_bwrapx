@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import unittest
+import os
 import subprocess
 
 class TestCommandReconstruction(unittest.TestCase):
@@ -21,6 +22,16 @@ class TestCommandReconstruction(unittest.TestCase):
                 'expected': 'bwrap --bind a b --bind c d -- bash -i',
                 'full_match': True
             },
+            {
+                'command': ['./bwrapx', '--bind', "'/usr/lib/absurd.*'", '\g<0>', '--bind', 'c', 'd', '--', 'bash', '-i'],    
+                'expected': 'bwrap --bind c d -- bash -i',
+                'full_match': True        
+            },
+            {
+                'command': ['./bwrapx', '--bind', '/usr/bin/fals.*', '\g<0>', '--bind', 'c', 'd', '--', 'bash', '-i'],
+                'expected': 'bwrap --bind /usr/bin/false /usr/bin/false --bind c d -- bash -i',
+                'full_match': True
+            },
         ]
 
         for test_case in test_cases:
@@ -28,8 +39,13 @@ class TestCommandReconstruction(unittest.TestCase):
             expected = test_case['expected']
             full_match = test_case['full_match']
 
+            # Add TEST_BWRAPX environment variable to perform testing instead
+            # of the normal operation.
+            test_env = os.environ.copy()
+            test_env['TEST_BWRAPX'] = '1'
+
             # Run your script with the provided command line
-            completed_process = subprocess.run(command, capture_output=True, text=True)
+            completed_process = subprocess.run(command, capture_output=True, text=True, env=test_env)
 
             # Retrieve the stderr output from the completed process
             actual = completed_process.stdout.strip()
