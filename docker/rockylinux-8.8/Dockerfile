@@ -1,8 +1,8 @@
 FROM rockylinux:8.8
 
-RUN dnf install -y cmake gcc wget libtool xz git libcap-devel
+RUN dnf install -y cmake gcc make wget libtool xz git libcap-devel
 
-RUN wget https://ftp.gnu.org/gnu/autoconf/autoconf-2.71.tar.xz && \
+RUN wget --no-check-certificate https://ftp.gnu.org/gnu/autoconf/autoconf-2.71.tar.xz && \
     tar xf autoconf-2.71.tar.xz && \
     cd autoconf-2.71/ && \
     ./configure && \

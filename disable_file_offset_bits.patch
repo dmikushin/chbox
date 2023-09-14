@@ -1,0 +1,10 @@
+diff --git a/libfakeroot_time64.c b/libfakeroot_time64.c
+index 5b93a84..d1c03fa 100644
+--- a/libfakeroot_time64.c
++++ b/libfakeroot_time64.c
+@@ -1,3 +1,5 @@
++#undef _FILE_OFFSET_BITS
++
+ #include "config.h"
+ #include "communicate.h"
+ 

@@ -5,7 +5,7 @@ set(PROJECT_VERSION_MAJOR 1)
 set(PROJECT_VERSION_MINOR 0)
 set(PROJECT_VERSION_PATCH 0)
 
-option(DISABLE_HAVE_CAPSET "On Rocky Linux HAVE_CAPSET is causing errors and must be disabled" OFF)
+option(DISABLE_FILE_OFFSET_BITS "On CentOS 7 FILE_OFFSET_BITS macro must be undefined for some sources" OFF)
 
 include(ExternalProject)
 
@@ -53,8 +53,8 @@ ExternalProject_Add_Step(fakeroot
     DEPENDERS configure
 )
 
-if (DISABLE_HAVE_CAPSET)
-ExternalProject_Add_Patches(fakeroot ${CMAKE_CURRENT_SOURCE_DIR}/disable_have_capset.patch)
+if (DISABLE_FILE_OFFSET_BITS)
+ExternalProject_Add_Patches(fakeroot ${CMAKE_CURRENT_SOURCE_DIR}/disable_file_offset_bits.patch)
 endif()
 
 add_executable(fakeroot::fakeroot IMPORTED)
@@ -102,6 +102,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/chbox-debootstrap ${CMAKE_CURRENT_BIN
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/chbox-chroot ${CMAKE_CURRENT_BINARY_DIR}/bin/chbox-chroot COPYONLY)
 
 install(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/chbox-debootstrap DESTINATION bin)
+install(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/chbox-fakeroot DESTINATION bin)
 install(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/chbox-chroot DESTINATION bin)
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/fakeroot ${CMAKE_CURRENT_BINARY_DIR}/fakechroot ${CMAKE_CURRENT_BINARY_DIR}/debootstrap
     DESTINATION . USE_SOURCE_PERMISSIONS)
