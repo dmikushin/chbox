@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 CHBOX_DIR=$SCRIPT_DIR/..
-LD_LIBRARY_PATH=$CHBOX_DIR/fakeroot/lib:$CHBOX_DIR/fakechroot/lib/fakechroot $CHBOX_DIR/fakeroot/bin/fakeroot $CHBOX_DIR/fakechroot/bin/fakechroot chroot $@
+LD_LIBRARY_PATH=$CHBOX_DIR/fakeroot/lib:$CHBOX_DIR/fakechroot/lib/fakechroot:$LD_LIBRARY_PATH $CHBOX_DIR/fakeroot/bin/fakeroot $CHBOX_DIR/fakechroot/bin/fakechroot chroot $@
