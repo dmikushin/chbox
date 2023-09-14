@@ -35,7 +35,7 @@ def is_valid_regex(pattern):
 
 def execute_bwrap_command(command_line):
     # Execute the command and capture its STDOUT, STDERR, and return code
-    completed_process = subprocess.run(command_line, capture_output=True, text=True)
+    completed_process = subprocess.run(command_line, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
 
     # Forward the STDOUT and STDERR to bwrapx's STDOUT
     print(completed_process.stdout)
@@ -191,9 +191,12 @@ if __name__ == '__main__':
             continue
 
         if not arg in ('bind', 'bind-try', 'dev-bind', 'dev-bind-try', 'ro-bind', 'ro-bind-try', 'symlink', 'remount-ro', 'chmod'):
-            for value in values:
-                new_args.append((arg, value))
-            continue
+            if isinstance(values, list):
+                for value in values:
+                    new_args.append((arg, value))
+                continue
+            else:
+                new_args.append((arg, values))
 
 
     # Substitute args with new_args and use it in the same
@@ -209,14 +212,21 @@ if __name__ == '__main__':
     # the args object into a list of command-line arguments
     command_line = [ parser.prog ]
     for arg, value in vars(args).items():
+        arg = re.sub('_', '-', arg)
         if value is not None and arg not in ('help', 'version', 'command') and value != parser.get_default(arg):
             if isinstance(value, list):
                 for item in value:
                     command_line.append(f'--{arg}')
-                    command_line.extend(item)
+                    if isinstance(item, list):
+                        command_line.extend(item)
+                    elif isinstance(item, bool):
+                        pass
+                    else:
+                        command_line.append(item)
             else:
                 command_line.append(f'--{arg}')
-                command_line.append(value)
+                if not isinstance(value, bool):
+                    command_line.append(value)
 
     if dash:
         command_line.append(dash)
@@ -226,7 +236,6 @@ if __name__ == '__main__':
     if os.environ.get('TEST_BWRAPX'):
         # If TEST_BWRAPX is defined, print the final command line for testing
         print(' '.join(command_line))
-
     else:
         # If TEST_BWRAPX is not defined, execute the bwrap command
         print(' '.join(command_line))
