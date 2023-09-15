@@ -38,8 +38,12 @@ def execute_bwrap_command(command_line):
     # Create a pseudo-terminal (pty) pair
     master_fd, slave_fd = pty.openpty()
 
-    # Execute the bash shell process
-    bash_process = subprocess.Popen(command_line, stdin=slave_fd, stdout=slave_fd, stderr=slave_fd, close_fds=True)
+    # Execute the shell process
+    pid, shell_fd = pty.fork()
+
+    if pid == 0:
+        # In the child process, execute the shell (bash in this case)
+        os.execv('/bin/bash', command_line)
 
     # Close the slave file descriptor as it is no longer needed in the parent process
     os.close(slave_fd)
@@ -52,10 +56,11 @@ def execute_bwrap_command(command_line):
             if not output:
                 break  # If the output is empty, the shell process has exited
             # Process the output or perform any desired operations
-            print(output.decode(), end='')  # Print the output to the console
+            sys.stdout.write(output.decode())  # Print the output to the console
+            sys.stdout.flush()
 
             # Process any input from the user
-            user_input = input()
+            user_input = sys.stdin.readline()
             # Write the user input to the master file descriptor
             os.write(master_fd, user_input.encode())
         except KeyboardInterrupt:
@@ -63,11 +68,9 @@ def execute_bwrap_command(command_line):
             break
 
     # Wait for the shell process to finish
-    bash_process.wait()
+    _, return_code = os.waitpid(pid, 0)
 
-    # Return the return code of the executed command
-    return bash_process.returncode
-
+    return return_code
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='bwrap',
