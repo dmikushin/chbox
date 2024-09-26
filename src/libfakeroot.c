@@ -275,9 +275,6 @@ int fakeroot_disabled = 0;
 int fakeroot_debug = 0;
 #endif /* LIBFAKEROOT_DEBUGGING */
 
-#ifdef __APPLE__
-#include "patchattr.h"
-#endif
 #include "wrapped.h"
 #include "wraptmpf.h"
 #include "wrapdef.h"
